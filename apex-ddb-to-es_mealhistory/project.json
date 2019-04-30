@@ -1,0 +1,8 @@
+{
+  "name": "apex-ddb-to-es_mealhistory",
+  "description": "apex-ddb-to-es_mealhistory is dynamoDB to elasticsearch mealhistory by Ando",
+  "memory": 128,
+  "timeout": 5,
+  "role": "arn:aws:iam::183767703888:role/apex-ddb-to-es_mealhistory_lambda_function",
+  "environment": {}
+}
