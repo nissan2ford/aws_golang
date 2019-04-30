@@ -39,59 +39,6 @@ type Response struct {
     Ok      bool   `json:"ok"`
 }
 
-func Scanmealhistory()(Response, error) {
-	// session
-	sess, err := session.NewSession()
-	if err != nil {
-		panic(err)
-	}
-
-	svc := dynamodb.New(sess,aws.NewConfig().WithRegion("ap-northeast-1"))
-
-	// Query
-	queryParams := &dynamodb.QueryInput {
-		TableName: aws.String(ddbTablename),
-		KeyConditionExpression: aws.String("#MealTime = :mealtime AND #Date >= :fromdate"),
-		ExpressionAttributeNames: map[string]*string {
-			"#MealTime": aws.String("MealTime"),
-			"#Date": aws.String("Date"),
-			"#Day_of_week": aws.String("Day_of_week"),
-			"#MealMethod": aws.String("MealMethod"),		
-		},
-		ExpressionAttributeValues: map[string]*dynamodb.AttributeValue {
-			":mealtime": {
-				S: aws.String("MOR"),
-//				S: aws.String("LUN"),
-//				S: aws.String("DIN"),
-			},
-			":fromdate": {
-				N: aws.String("20170901"),
-			},
-		},
-		ProjectionExpression: aws.String("#MealTime, #Date, #Day_of_week, #MealMethod"),
-		ScanIndexForward: aws.Bool(false),
-
-	}
-
-	queryItem, queryErr := svc.Query(queryParams)
-	if queryErr != nil {
-		panic(queryErr)
-	}
-
-	fmt.Println(queryItem)
-
-	// convert json
-	mddatas := make([]*MDdata, 0)
-	if err := dynamodbattribute.UnmarshalListOfMaps(queryItem.Items, &mddatas); err != nil {
-		fmt.Println("[Unmarshal Error]", err)
-		panic(queryErr)
-	}
-
-	return Response {
-		Message: fmt.Sprintln(queryItem),
-		Ok:	true,
-	}, nil
-}
 
 //func PutES()(Response, error) {
 //		transport := signer.NewTransport(session.New(&aws.Config{Region:aws.String(rec.AWSRegion)}), elasticsearchservice.ServiceName)
