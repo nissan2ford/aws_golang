@@ -44,30 +44,36 @@ provider:
   iamRoleStatements:
     - Effect: "Allow"
       Action:
-        - "dynamodb:BatchGetItem",
-        - "dynamodb:ConditionCheckItem",
-        - "dynamodb:ListTables",
-        - "dynamodb:ListBackups",
-        - "dynamodb:Scan",
-        - "dynamodb:ListTagsOfResource",
-        - "dynamodb:Query",
-        - "dynamodb:DescribeStream",
-        - "dynamodb:DescribeTimeToLive",
-        - "dynamodb:ListStreams",
-        - "dynamodb:DescribeGlobalTableSettings",
-        - "dynamodb:DescribeReservedCapacityOfferings",
-        - "dynamodb:ListGlobalTables",
-        - "dynamodb:DescribeTable",
-        - "dynamodb:GetShardIterator",
-        - "dynamodb:DescribeGlobalTable",
-        - "dynamodb:DescribeReservedCapacity",
-        - "dynamodb:GetItem",
-        - "dynamodb:DescribeContinuousBackups",
-        - "dynamodb:DescribeLimits",
-        - "dynamodb:DescribeBackup",
-        - "dynamodb:GetRecords"
+        - dynamodb:BatchGetItem
+        - dynamodb:ConditionCheckItem
+        - dynamodb:ListTables
+        - dynamodb:ListBackups
+        - dynamodb:Scan
+        - dynamodb:ListTagsOfResource
+        - dynamodb:Query
+        - dynamodb:DescribeStream
+        - dynamodb:DescribeTimeToLive
+        - dynamodb:ListStreams
+        - dynamodb:DescribeGlobalTableSettings
+        - dynamodb:DescribeReservedCapacityOfferings
+        - dynamodb:ListGlobalTables
+        - dynamodb:DescribeTable
+        - dynamodb:GetShardIterator
+        - dynamodb:DescribeGlobalTable
+        - dynamodb:DescribeReservedCapacity
+        - dynamodb:GetItem
+        - dynamodb:DescribeContinuousBackups
+        - dynamodb:DescribeLimits
+        - dynamodb:DescribeBackup
+        - dynamodb:GetRecords
       Resource:
         "*"
+
+    - Effect: "Allow"
+      Action:
+        - es:*
+      Resource:
+        "arn:aws:es:ap-northeast-1:183767703888:domain/es-mealhistory"
 
 # you can define service wide environment variables here
 #  environment:
@@ -111,6 +117,12 @@ functions:
 #      - cognitoUserPool:
 #          pool: MyUserPool
 #          trigger: PreSignUp
+
+    events:
+      - "MealTime": "MOR"
+      - "Date": 20190501
+      - "Day_of_week": "Wed"
+      - "MealMethod": "Hom"
 
 #    Define function environment variables here
 #    environment:
