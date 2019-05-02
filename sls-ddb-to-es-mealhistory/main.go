@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 
+	"log"
+
 //	"encoding/json"
 
 	"github.com/aws/aws-lambda-go/lambda"
@@ -22,24 +24,19 @@ const (
 	// dynamoDB Table Name
 	ddbTablename = "meal_history"
 
-	esUrl = "https://search-es-mealhistory-yqcvq335bq5okinup2ohti24gy.ap-northeast-1.es.amazonaws.com"
+//	esUrl = "https://search-es-mealhistory-yqcvq335bq5okinup2ohti24gy.ap-northeast-1.es.amazonaws.com"
 //	esIndex = 
 )
 
 // define mealhistory type
-type MDdata struct {
+type MHdata struct {
 	MealTime	string	`json:"MealTime"`	// primary pertition key
 	Date		int	`json:"Date"`		// primary sort key
 	Day_of_week	string	`json:"Day_of_week"`
 	MealMethod	string	`json:"MealMethod"`
 }
 
-type Response struct {
-    Message string `json:"message"`
-    Ok      bool   `json:"ok"`
-}
-
-func Scanmealhistory()(Response, error) {
+func Scanmealhistory(mhdatas *[]MHdata)(string, error) {
 	// session
 	sess, err := session.NewSession()
 	if err != nil {
@@ -51,7 +48,7 @@ func Scanmealhistory()(Response, error) {
 	// Query
 	queryParams := &dynamodb.QueryInput {
 		TableName: aws.String(ddbTablename),
-		KeyConditionExpression: aws.String("#MealTime = :mealtime AND #Date >= :fromdate"),
+		KeyConditionExpression: aws.String("(#MealTime = :mor OR #MealTime = :lun OR #MealTime = :din) AND #Date >= :fromdate"),
 		ExpressionAttributeNames: map[string]*string {
 			"#MealTime": aws.String("MealTime"),
 			"#Date": aws.String("Date"),
@@ -59,10 +56,14 @@ func Scanmealhistory()(Response, error) {
 			"#MealMethod": aws.String("MealMethod"),		
 		},
 		ExpressionAttributeValues: map[string]*dynamodb.AttributeValue {
-			":mealtime": {
+			":mor": {
 				S: aws.String("MOR"),
-//				S: aws.String("LUN"),
-//				S: aws.String("DIN"),
+			},
+			":lun": {
+				S: aws.String("LUN"),
+			},
+			":din": {
+				S: aws.String("DIN"),
 			},
 			":fromdate": {
 				N: aws.String("20170901"),
@@ -78,44 +79,33 @@ func Scanmealhistory()(Response, error) {
 		panic(queryErr)
 	}
 
-	fmt.Println(queryItem)
-
 	// convert json
-	mddatas := make([]*MDdata, 0)
-	if err := dynamodbattribute.UnmarshalListOfMaps(queryItem.Items, &mddatas); err != nil {
-		fmt.Println("[Unmarshal Error]", err)
+//	mhdatas := make([]*MHdata, 0)
+	if err := dynamodbattribute.UnmarshalListOfMaps(queryItem.Items, &mhdatas); err != nil {
+		log.Println("[Unmarshal Error]", err)
 		panic(queryErr)
 	}
 
-	return Response {
-		Message: fmt.Sprintln(queryItem),
-		Ok:	true,
-	}, nil
+	return fmt.Sprintln(queryItem.Items), nil
 }
 
-//func PutES()(Response, error) {
-//		transport := signer.NewTransport(session.New(&aws.Config{Region:aws.String(rec.AWSRegion)}), elasticsearchservice.ServiceName)
-
-//		httpClient := &http.Client{
-//			Transport: transport,
-//		}
-
-		// Elasticsearchに接続
-//		client, err := elastic.NewClient(
-//			elastic.SetSniff(false),
-//			elastic.SetURL(esUrl), // AWS Elasticsearchのエンドポイント
-//			elastic.SetScheme("https"),
-//			elastic.SetHttpClient(httpClient),
-//		)
-//}
-
-func Handler() (Response, error) {
+func Handler() ([]MHdata, error) {
 	// 処理部分
-	msg, err := Scanmealhistory()
 
-	return msg,err
+	// 変数初期化
+	data := make([]MHdata,0)
+	msg, err := Scanmealhistory(&data)
+
+	// output data
+//	var output []string
+//	for _, i := range data {
+//		append(output,string(data[i]))
+//	}
+
+	log.Println(msg)
+
+	return data, err
 }
-
 
 func main() {
     lambda.Start(Handler)
