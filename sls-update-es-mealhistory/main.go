@@ -41,12 +41,6 @@ type MHdata struct {
 	MealMethod	string	`json:"MealMethod"`
 }
 
-//type Response struct {
-//    Message string `json:"message"`
-//    Ok      bool   `json:"ok"`
-//}
-
-
 func PutES(mhdata *MHdata)(string, error) {
 		transport := signer.NewTransport(session.New(&aws.Config{Region:aws.String(region)}), elasticsearchservice.ServiceName)
 
@@ -95,12 +89,20 @@ func putDataIntoES(c *elastic.Client, indexName string,mhdata *MHdata)(string, e
 	// Convert JSON
 	b, err := json.Marshal(mhdata)
 
+	if err != nil {
+		panic(err)
+	}
+
 	return string(b), nil
 }
 
 func Handler(input *MHdata) (string, error) {
 	// 処理部分
 	msg, err := PutES(input)
+
+	if err != nil {
+		panic(err)
+	}
 
 	return msg,err
 }
