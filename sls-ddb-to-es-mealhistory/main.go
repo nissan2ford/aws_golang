@@ -135,19 +135,19 @@ func Handler() (string, error) {
 	log.Println(data)
 
 	// Insert elasticsearch from mhdatas
-	for _, mhdata := range mhdatas {
+	for _, mhdata := range data {
 
-		msg, err := PutES(mhdata)
+		msg, err := PutES(&mhdata)
 
 		if err != nil {
 			panic(err)
 		}
+
+		log.Println(msg)
+
 	}
 
-	// data count
-	count := range mhdatas
-
-	return fmt.Printf("%d mealhistory datas was inserted",count), err
+	return fmt.Sprintf("%d mealhistory datas was inserted",len(data)), err
 }
 
 func main() {
