@@ -1,0 +1,36 @@
+{
+  "Records": [
+    {
+      "eventID": "1",
+      "eventVersion": "1.0",
+      "dynamodb": {
+        "Keys": {
+          "MealTime": {
+            "S": "MOR"
+          }
+        },
+        "NewImage": {
+          "MealTime": {
+            "S": "MOR"
+          },
+          "Date": {
+            "N": "20190502"
+          },
+          "Day_of_week": {
+            "S": "Thu"
+          },
+          "MealMethod": {
+            "S": "Hom"
+          }
+        },
+        "StreamViewType": "NEW_AND_OLD_IMAGES",
+        "SequenceNumber": "111",
+        "SizeBytes": 26
+      },
+      "awsRegion": "ap-northeast-1",
+      "eventName": "INSERT",
+      "eventSourceARN": "arn:aws:dynamodb:ap-northeast-1:183767703888:table/meal_history/stream/2019-05-02T14:10:15.140",
+      "eventSource": "aws:dynamodb"
+    }
+  ]
+}
