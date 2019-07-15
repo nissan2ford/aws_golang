@@ -1,0 +1,44 @@
+package main
+
+import (
+	"fmt"
+	"httpfunc"
+	"time"
+)
+
+func main() {
+
+	urls := []string{
+		//		"http://192.168.11.1",
+		"http://www.yahoo.co.jp",
+		//		"http://github.com",
+	}
+
+	// make channel
+	responseChan := make(chan string)
+	durationChan := make(chan time.Duration)
+	reqUrlChan := make(chan string)
+	starttimeChan := make(chan time.Time)
+
+	for _, url := range urls {
+
+		// go routine
+		go func(url string) {
+
+			requrl, rescode, duration, starttime := httpfunc.ConnHttp(url)
+
+			fmt.Println("Start Time = ", starttime)
+
+			reqUrlChan <- requrl
+			responseChan <- rescode
+			durationChan <- duration
+			starttimeChan <- starttime
+
+		}(url)
+	}
+
+	for i := 0; i < len(urls); i++ {
+		fmt.Println(<-reqUrlChan, <-responseChan, "TAT=", <-durationChan, "StartTime = ", <-starttimeChan)
+	}
+
+}
